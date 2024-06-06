@@ -50,26 +50,13 @@ jobs:
       - name: 'Get Terraform Outputs'
         working-directory: ./test
         run: |
-          echo "OUTPUT"
           terraform output -json > raw_output.json
-          echo "Extracting JSON"
           # Extract JSON portion only
           sed -n '/^{/,/^}/p' raw_output.json > terraform_output.json
-          echo "Count lines"
-          line_count=$(cat terraform_output.json | wc -l)
-          echo "Number of lines: $line_count"
-          echo "Content of terraform_output.json:"
-          cat terraform_output.json
-          echo "JQ and store to file"
           if ! jq '.' terraform_output.json > parsed_output.json; then
             echo "Error in JQ parsing"
             exit 1
           fi
-        shell: /usr/bin/bash -e {0}
-
-      - name: "debug"
-        working-directory: ./test
-        run: awk 'NR==43' terraform_output.json
 
       - name: 'Compare Outputs'
         working-directory: ./test
