@@ -33,22 +33,18 @@ jobs:
 
       - name: 'Terraform Init'
         working-directory: ./test
-        id: init
         run: terraform init
 
       - name: 'Terraform Validate'
         working-directory: ./test
-        id: validate
         run: terraform validate
 
       - name: 'Terraform Plan'
         working-directory: ./test
-        id: plan
         run: terraform plan
 
       - name: 'Terraform Apply'
         working-directory: ./test
-        id: apply
         run: terraform apply -auto-approve
 
       - name: 'Get Terraform Outputs'
@@ -67,13 +63,17 @@ jobs:
           expected=$(jq -c 'sort_by(.resource_name, .namespace, .vcluster_name)' expected_output.json)
           terraform=$(jq -c '.updated_names.value | sort_by(.resource_name, .namespace, .vcluster_name)' terraform_output.json)
 
-          echo "Parsed Expected: $expected"
-          echo "Parsed Terraform: $terraform"
+          # Remove any unexpected characters or lines
+          expected_clean=$(echo "$expected" | tr -d '\r' | tr -d '\n')
+          terraform_clean=$(echo "$terraform" | tr -d '\r' | tr -d '\n')
 
-          if [ "$expected" != "$terraform" ]; then
+          echo "Parsed Expected: $expected_clean"
+          echo "Parsed Terraform: $terraform_clean"
+
+          if [ "$expected_clean" != "$terraform_clean" ]; then
             echo "Output does not match expected value!"
-            echo "Expected: $expected"
-            echo "Terraform: $terraform"
+            echo "Expected: $expected_clean"
+            echo "Terraform: $terraform_clean"
             exit 1
           else
             echo "Output matches expected value."
