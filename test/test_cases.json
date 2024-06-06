@@ -1,0 +1,12 @@
+[
+    {
+      "resource_name": "some-resource-with-long-name",
+      "namespace": "some-namespace-with-long-name",
+      "vcluster_name": "some-vcluster-with-long-name"
+    },
+    {
+      "resource_name": "another-resource",
+      "namespace": "another-namespace",
+      "vcluster_name": "another-vcluster"
+    }
+  ]
