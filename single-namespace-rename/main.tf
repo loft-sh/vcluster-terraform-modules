@@ -17,7 +17,3 @@ locals {
   safe_name         = length(local.concatenated_name) > 63 ? "${substr(local.concatenated_name, 0, 52)}-${local.digest}" : local.concatenated_name
   final_name        = replace(local.safe_name, ".-", "-")
 }
-
-output "safe_concatenated_name" {
-  value = local.final_name
-}
