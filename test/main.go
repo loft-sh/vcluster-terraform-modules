@@ -14,6 +14,7 @@ type TestCase struct {
 	ResourceName string `json:"resource_name"`
 	Namespace    string `json:"namespace"`
 	VclusterName string `json:"vcluster_name"`
+	UpdatedName  string `json:"updated_name"`
 }
 
 func main() {
@@ -34,8 +35,15 @@ func main() {
 		log.Fatalf("failed to unmarshal test cases: %v", err)
 	}
 
-	for _, tc := range testCases {
+	for i, tc := range testCases {
 		expectedName := translate.SingleNamespacePhysicalName(tc.ResourceName, tc.Namespace, tc.VclusterName)
-		fmt.Printf("%s %s %s %s\n", tc.ResourceName, tc.Namespace, tc.VclusterName, expectedName)
+		testCases[i].UpdatedName = expectedName
 	}
+
+	output, err := json.MarshalIndent(testCases, "", "  ")
+	if err != nil {
+		log.Fatalf("failed to marshal test cases: %v", err)
+	}
+
+	fmt.Println(string(output))
 }

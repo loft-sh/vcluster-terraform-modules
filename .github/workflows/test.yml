@@ -29,7 +29,7 @@ jobs:
 
       - name: 'Run Go Test Cases'
         working-directory: ./test
-        run: go run main.go > expected_output.txt
+        run: go run main.go > expected_output.json
 
       - name: 'Terraform Init'
         working-directory: ./test
@@ -58,8 +58,8 @@ jobs:
       - name: 'Compare Outputs'
         working-directory: ./test
         run: |
-          expected=$(cat expected_output.txt)
-          terraform=$(jq -r '.updated_names.value[] | "\(.resource_name) \(.namespace) \(.vcluster_name) \(.updated_name)"' terraform_output.json)
+          expected=$(jq -c . expected_output.json)
+          terraform=$(jq -c . terraform_output.json | jq -r '.updated_names.value')
           if [ "$expected" != "$terraform" ]; then
             echo "Output does not match expected value!"
             echo "Expected: $expected"
@@ -70,7 +70,6 @@ jobs:
           fi
 
       - name: 'Terraform Destroy'
-        id: destroy
         working-directory: ./test
         if: always()
         run: terraform destroy -auto-approve
