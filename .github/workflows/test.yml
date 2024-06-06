@@ -49,7 +49,13 @@ jobs:
 
       - name: 'Get Terraform Outputs'
         working-directory: ./test
-        run: terraform output -json | tail -n +2 | sed '$d' | jq > terraform_output.json
+        run: |
+          echo "OUTPUT"
+          terraform output -json | tail -n +2
+          echo "Count lines"
+          terraform output -json | tail -n +2 | wc -l
+          echo "JQ and store to file"
+          terraform output -json | tail -n +2 | sed '$d' | jq > terraform_output.json
 
       - name: "debug"
         working-directory: ./test
