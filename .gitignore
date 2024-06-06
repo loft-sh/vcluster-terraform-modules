@@ -1,4 +1,6 @@
 .terraform/
 .terraform*
 result_*
-*.tfstate
+*.tfstate*
+expected_output.json
+terraform_output.json
