@@ -51,7 +51,7 @@ jobs:
         working-directory: ./test
         run: |
           echo "OUTPUT"
-          terraform output -json > terraform_output.json
+          terraform output -json | tail -n +2 > terraform_output.json
           echo "Count lines"
           line_count=$(cat terraform_output.json | wc -l)
           echo "Number of lines: $line_count"
