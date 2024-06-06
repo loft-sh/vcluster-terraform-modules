@@ -58,12 +58,19 @@ jobs:
       - name: 'Compare Outputs'
         working-directory: ./test
         run: |
+          echo "Expected Output:"
+          cat expected_output.json
+          echo "Terraform Output:"
+          cat terraform_output.json
+
           expected=$(jq -c . expected_output.json)
-          terraform=$(jq -c . terraform_output.json | jq -r '.updated_names.value')
+          terraform=$(jq -c '.updated_names.value' terraform_output.json)
+
+          echo "Parsed Expected: $expected"
+          echo "Parsed Terraform: $terraform"
+
           if [ "$expected" != "$terraform" ]; then
             echo "Output does not match expected value!"
-            echo "Expected: $expected"
-            echo "Terraform: $terraform"
             exit 1
           else
             echo "Output matches expected value."
