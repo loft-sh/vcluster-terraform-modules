@@ -63,6 +63,11 @@ jobs:
           expected=$(jq -c 'sort_by(.resource_name, .namespace, .vcluster_name)' expected_output.json)
           terraform=$(jq -c '.updated_names.value | sort_by(.resource_name, .namespace, .vcluster_name)' terraform_output.json)
 
+          echo "EXPECTED"
+          echo "${expected}"
+          echo "TERRAFORM"
+          echo "${terraform}"
+
           # Remove any unexpected characters or lines
           expected_clean=$(echo "$expected" | tr -d '\r' | tr -d '\n')
           terraform_clean=$(echo "$terraform" | tr -d '\r' | tr -d '\n')
