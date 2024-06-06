@@ -69,8 +69,14 @@ jobs:
           echo "Parsed Expected: $expected"
           echo "Parsed Terraform: $terraform"
 
+          # Extract values from JSON and convert to a comparable format
+          expected=$(jq -c 'sort_by(.resource_name, .namespace, .vcluster_name)' expected_output.json)
+          terraform=$(jq -c '.updated_names.value | sort_by(.resource_name, .namespace, .vcluster_name)' terraform_output.json)
+
           if [ "$expected" != "$terraform" ]; then
             echo "Output does not match expected value!"
+            echo "Expected: $expected"
+            echo "Terraform: $terraform"
             exit 1
           else
             echo "Output matches expected value."
