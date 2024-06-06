@@ -57,11 +57,14 @@ jobs:
           echo "Number of lines: $line_count"
           echo "Content of terraform_output.json:"
           cat terraform_output.json
+          echo "Inspecting byte-level content of terraform_output.json:"
+          od -c terraform_output.json
           echo "JQ and store to file"
           if ! jq '.' terraform_output.json > parsed_output.json; then
             echo "Error in JQ parsing"
             exit 1
           fi
+        shell: /usr/bin/bash -e {0}
 
       - name: "debug"
         working-directory: ./test
