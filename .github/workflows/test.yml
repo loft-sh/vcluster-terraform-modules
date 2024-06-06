@@ -51,6 +51,10 @@ jobs:
         working-directory: ./test
         run: terraform output -json | tail -n +2 > terraform_output.json
 
+      - name: "debug"
+        working-directory: ./test
+        run: awk 'NR==43' terraform_output.json
+
       - name: 'Compare Outputs'
         working-directory: ./test
         run: |
