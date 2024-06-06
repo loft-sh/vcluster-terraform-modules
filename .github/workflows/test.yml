@@ -51,14 +51,17 @@ jobs:
         working-directory: ./test
         run: |
           echo "OUTPUT"
-          terraform output -json | tail -n +2 > terraform_output.json
+          terraform output -json | sed '1d' > terraform_output.json
           echo "Count lines"
           line_count=$(cat terraform_output.json | wc -l)
           echo "Number of lines: $line_count"
           echo "Content of terraform_output.json:"
           cat terraform_output.json
           echo "JQ and store to file"
-          jq '.' terraform_output.json > parsed_output.json || (echo "Error in JQ" && exit 1)
+          if ! jq '.' terraform_output.json > parsed_output.json; then
+            echo "Error in JQ parsing"
+            exit 1
+          fi
 
       - name: "debug"
         working-directory: ./test
