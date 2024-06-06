@@ -67,12 +67,12 @@ jobs:
           cat terraform_output.json | jq
 
           # Extract values from JSON and convert to a comparable format
-          expected=$(jq -c 'sort_by(.resource_name, .namespace, .vcluster_name)' expected_output.json)
+          expected=$(jq -S -c 'sort_by(.resource_name, .namespace, .vcluster_name)' expected_output.json)
 
           echo "EXPECTED"
           echo "${expected}"
 
-          terraform=$(jq -c '.updated_names.value | sort_by(.resource_name, .namespace, .vcluster_name)' terraform_output.json)
+          terraform=$(jq -S -c '.updated_names.value | sort_by(.resource_name, .namespace, .vcluster_name)' terraform_output.json)
 
           echo "TERRAFORM"
           echo "${terraform}"
