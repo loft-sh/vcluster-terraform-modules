@@ -61,28 +61,13 @@ jobs:
       - name: 'Compare Outputs'
         working-directory: ./test
         run: |
-          echo "Expected Output:"
-          cat expected_output.json | jq
-          echo "Terraform Output:"
-          cat terraform_output.json | jq
-
           # Extract values from JSON and convert to a comparable format
           expected=$(jq -S -c 'sort_by(.resource_name, .namespace, .vcluster_name)' expected_output.json)
-
-          echo "EXPECTED"
-          echo "${expected}"
-
           terraform=$(jq -S -c '.updated_names.value | sort_by(.resource_name, .namespace, .vcluster_name)' terraform_output.json)
-
-          echo "TERRAFORM"
-          echo "${terraform}"
 
           # Remove any unexpected characters or lines
           expected_clean=$(echo "$expected" | tr -d '\r' | tr -d '\n')
           terraform_clean=$(echo "$terraform" | tr -d '\r' | tr -d '\n')
-
-          echo "Parsed Expected: $expected_clean"
-          echo "Parsed Terraform: $terraform_clean"
 
           if [ "$expected_clean" != "$terraform_clean" ]; then
             echo "Output does not match expected value!"
