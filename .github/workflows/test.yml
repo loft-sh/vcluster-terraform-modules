@@ -51,11 +51,12 @@ jobs:
         working-directory: ./test
         run: |
           echo "OUTPUT"
-          terraform output -json | tail -n +2
+          terraform output -json | tail -n +2 | cat -n
           echo "Count lines"
-          terraform output -json | tail -n +2 | wc -l
+          line_count=$(terraform output -json | tail -n +2 | wc -l)
+          echo "Number of lines: $line_count"
           echo "JQ and store to file"
-          terraform output -json | tail -n +2 | jq > terraform_output.json
+          terraform output -json | tail -n +2 | jq '.' > terraform_output.json
 
       - name: "debug"
         working-directory: ./test
