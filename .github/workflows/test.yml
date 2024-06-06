@@ -49,7 +49,7 @@ jobs:
 
       - name: 'Get Terraform Outputs'
         working-directory: ./test
-        run: terraform output -json | jq > terraform_output.json
+        run: terraform output -json | tail -n +2 | jq > terraform_output.json
 
       - name: "debug"
         working-directory: ./test
