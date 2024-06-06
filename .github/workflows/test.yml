@@ -51,14 +51,15 @@ jobs:
         working-directory: ./test
         run: |
           echo "OUTPUT"
-          terraform output -json | sed '1d' > terraform_output.json
+          terraform output -json > raw_output.json
+          echo "Extracting JSON"
+          # Extract JSON portion only
+          sed -n '/^{/,/^}/p' raw_output.json > terraform_output.json
           echo "Count lines"
           line_count=$(cat terraform_output.json | wc -l)
           echo "Number of lines: $line_count"
           echo "Content of terraform_output.json:"
           cat terraform_output.json
-          echo "Inspecting byte-level content of terraform_output.json:"
-          od -c terraform_output.json
           echo "JQ and store to file"
           if ! jq '.' terraform_output.json > parsed_output.json; then
             echo "Error in JQ parsing"
