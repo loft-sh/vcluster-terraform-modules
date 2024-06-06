@@ -53,7 +53,11 @@ jobs:
 
       - name: 'Get Terraform Outputs'
         working-directory: ./test
-        run: terraform output -json | tail -n +1 > terraform_output.json
+        run: terraform output -json > terraform_output.json
+
+      - name: DEBUG
+        working-directory: ./test
+        run: cat terraform_output.json
 
       - name: 'Compare Outputs'
         working-directory: ./test
