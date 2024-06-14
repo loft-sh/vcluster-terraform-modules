@@ -1,6 +1,12 @@
-variable "url" {
-  description = "The URL to send the POST request to"
+variable "host" {
+  description = "The vCluster Platform host URL."
   type        = string
+}
+
+variable "insecure" {
+    description = "Disables verification of the server's certificate chain and hostname."
+    type        = bool
+    default     = false
 }
 
 variable "auth_token" {
@@ -22,3 +28,4 @@ variable "vcluster_name" {
   description = "Value for spec.vclusterName in the JSON payload"
   type        = string
 }
+
