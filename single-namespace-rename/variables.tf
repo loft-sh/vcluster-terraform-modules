@@ -1,14 +1,31 @@
-variable "resource_name" {
-  description = "The resource name"
+variable "host" {
+  description = "The vCluster Platform host URL."
   type        = string
 }
 
-variable "namespace" {
-  description = "The namespace"
+variable "insecure" {
+    description = "Disables verification of the server's certificate chain and hostname."
+    type        = bool
+    default     = false
+}
+
+variable "auth_token" {
+  description = "The authorization token to be passed in the POST request"
+  type        = string
+}
+
+variable "resource_name" {
+  description = "Value for spec.name in the JSON payload"
+  type        = string
+}
+
+variable "resource_namespace" {
+  description = "Value for spec.namespace in the JSON payload"
   type        = string
 }
 
 variable "vcluster_name" {
-  description = "The vcluster name"
+  description = "Value for spec.vclusterName in the JSON payload"
   type        = string
 }
+
