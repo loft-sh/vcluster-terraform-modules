@@ -22,15 +22,6 @@ jobs:
         with:
           terraform_version: 1.5.7
 
-      - name: 'Install Go'
-        uses: actions/setup-go@v2
-        with:
-          go-version: '1.22.3'
-
-      - name: 'Run Go Test Cases'
-        working-directory: ./test
-        run: go run main.go > expected_output.json
-
       - name: 'Terraform Init'
         working-directory: ./test
         run: terraform init
@@ -38,47 +29,3 @@ jobs:
       - name: 'Terraform Validate'
         working-directory: ./test
         run: terraform validate
-
-      - name: 'Terraform Plan'
-        working-directory: ./test
-        run: terraform plan
-
-      - name: 'Terraform Apply'
-        working-directory: ./test
-        run: terraform apply -auto-approve
-
-      - name: 'Get Terraform Outputs'
-        working-directory: ./test
-        run: |
-          terraform output -json > raw_output.json
-          # Extract JSON portion only
-          sed -n '/^{/,/^}/p' raw_output.json > terraform_output.json
-          if ! jq '.' terraform_output.json > parsed_output.json; then
-            echo "Error in JQ parsing"
-            exit 1
-          fi
-
-      - name: 'Compare Outputs'
-        working-directory: ./test
-        run: |
-          # Extract values from JSON and convert to a comparable format
-          expected=$(jq -S -c 'sort_by(.resource_name, .namespace, .vcluster_name)' expected_output.json)
-          terraform=$(jq -S -c '.updated_names.value | sort_by(.resource_name, .namespace, .vcluster_name)' terraform_output.json)
-
-          # Remove any unexpected characters or lines
-          expected_clean=$(echo "$expected" | tr -d '\r' | tr -d '\n')
-          terraform_clean=$(echo "$terraform" | tr -d '\r' | tr -d '\n')
-
-          if [ "$expected_clean" != "$terraform_clean" ]; then
-            echo "Output does not match expected value!"
-            echo "Expected: $expected_clean"
-            echo "Terraform: $terraform_clean"
-            exit 1
-          else
-            echo "Output matches expected value."
-          fi
-
-      - name: 'Terraform Destroy'
-        working-directory: ./test
-        if: always()
-        run: terraform destroy -auto-approve

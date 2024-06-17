@@ -2,12 +2,23 @@ locals {
   test_cases = jsondecode(file("${path.module}/test_cases.json"))
 }
 
+provider "http" {
+    alias = "default"
+}
+
 module "my_k8s_resource" {
   count         = length(local.test_cases)
   source        = "../single-namespace-rename"
-  resource_name = local.test_cases[count.index].resource_name
-  namespace     = local.test_cases[count.index].namespace
-  vcluster_name = local.test_cases[count.index].vcluster_name
+
+  providers = {
+    http.default = http.default
+  }
+
+  host               = "https://localhost:8080"
+  auth_token         = "foobar"
+  resource_name      = local.test_cases[count.index].resource_name
+  resource_namespace = local.test_cases[count.index].namespace
+  vcluster_name      = local.test_cases[count.index].vcluster_name
 }
 
 output "updated_names" {
