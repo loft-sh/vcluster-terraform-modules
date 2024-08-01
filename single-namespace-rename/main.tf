@@ -24,7 +24,7 @@ data "http" "post_request" {
   insecure = true
   request_headers = {
     "Content-Type"  = "application/json"
-    "Authorization" = "Bearer ${var.auth_token}"
+    "Authorization" = "Bearer ${var.access_key}"
   }
 
   request_body = jsonencode({
