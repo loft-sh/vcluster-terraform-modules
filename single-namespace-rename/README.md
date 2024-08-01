@@ -9,7 +9,7 @@ This module requires `http` provider to be passed to it.
 ## Variables
 
 - `host` - vCluster Platform host.
-- `auth_token` - Auth token for vCluster Platform API.
+- `access_key` - Access key for vCluster Platform API.
 - `resource_name` - Name of k8s resource deployed within virtual cluster.
 - `resource_namespace` - Namespace of k8s resource within virtual cluster.
 - `vcluster_name` - Name of virtual cluster hosting the resource.
@@ -35,8 +35,8 @@ module "my_k8s_resource" {
   }
 
 
-  host                = "https://localhost:8080"
-  auth_token          = var.auth_token
+  host                = var.vcluster_platform_host
+  access_key          = var.access_key
   resource_name       = var.service_account_name
   resource_namespace  = var.service_account_namespace
   vcluster_name       = var.vcluster_name

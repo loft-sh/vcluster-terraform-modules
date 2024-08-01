@@ -15,7 +15,7 @@ module "my_k8s_resource" {
   }
 
   host               = "https://localhost:8080"
-  auth_token         = "foobar"
+  access_key         = "foobar"
   resource_name      = local.test_cases[count.index].resource_name
   resource_namespace = local.test_cases[count.index].namespace
   vcluster_name      = local.test_cases[count.index].vcluster_name

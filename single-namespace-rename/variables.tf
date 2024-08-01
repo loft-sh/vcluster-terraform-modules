@@ -9,8 +9,8 @@ variable "insecure" {
     default     = false
 }
 
-variable "auth_token" {
-  description = "The authorization token to be passed in the POST request"
+variable "access_key" {
+  description = "vCluster Platform access key to authenticate to API"
   type        = string
 }
 
