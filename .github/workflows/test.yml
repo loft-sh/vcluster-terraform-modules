@@ -1,31 +1,131 @@
-name: Terraform CI
+name: OpenTofu CI
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
-    branches:
-      - main
+    branches: [main]
+    paths:
+      - '**/*.tf'
+      - '**/*.tftest.hcl'
+      - '.github/workflows/test.yml'
+      - '.terraform-docs.yml'
+      - '.tflint.hcl'
 
 jobs:
-  terraform:
-    name: 'Terraform'
+  fmt-check:
+    name: Format Check
     runs-on: ubuntu-latest
-
     steps:
-      - name: 'Checkout repository'
-        uses: actions/checkout@v2
-
-      - name: 'Set up Terraform'
-        uses: hashicorp/setup-terraform@v1
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: opentofu/setup-opentofu@9d84900f3238fab8cd84ce47d658d25dd008be2f # v1.0.8
         with:
-          terraform_version: 1.5.7
+          tofu_version: "1.9"
+      - name: OpenTofu Format Check
+        run: tofu fmt -check -recursive
 
-      - name: 'Terraform Init'
-        working-directory: ./test
-        run: terraform init
+  docs-check:
+    name: Docs Check
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        directory:
+          - vcluster
+          - vcluster-kubeconfig
+          - vcluster-platform-registration
+          - single-namespace-rename
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: terraform-docs/gh-actions@6de6da0cefcc6b4b7a5cbea4d79d97060733093c # v1.4.1
+        with:
+          working-dir: ${{ matrix.directory }}
+          output-file: README.md
+          output-method: inject
+          fail-on-diff: true
 
-      - name: 'Terraform Validate'
-        working-directory: ./test
-        run: terraform validate
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        directory:
+          - _shared/platform-context
+          - vcluster
+          - vcluster-kubeconfig
+          - vcluster-platform-registration
+          - single-namespace-rename
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: bridgecrewio/checkov-action@f9b0a2206b0401cad02ac0a66be2a7934a5be838 # v12
+        with:
+          directory: ${{ matrix.directory }}
+          framework: terraform
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        directory:
+          - _shared/platform-context
+          - vcluster
+          - vcluster-kubeconfig
+          - vcluster-platform-registration
+          - single-namespace-rename
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: terraform-linters/setup-tflint@4cb9feea73331a35b422df102992a03a44a3bb33 # v6.2.1
+      - name: TFLint
+        working-directory: ${{ matrix.directory }}
+        run: tflint
+
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        directory:
+          - _shared/platform-context
+          - vcluster
+          - vcluster-kubeconfig
+          - vcluster-platform-registration
+          # single-namespace-rename uses configuration_aliases and cannot be
+          # validated standalone. Use the wrapper module that provides the alias.
+          - single-namespace-rename/tests/validate
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: opentofu/setup-opentofu@9d84900f3238fab8cd84ce47d658d25dd008be2f # v1.0.8
+        with:
+          tofu_version: "1.9"
+      - name: OpenTofu Init
+        working-directory: ${{ matrix.directory }}
+        run: tofu init -backend=false
+      - name: OpenTofu Validate
+        working-directory: ${{ matrix.directory }}
+        run: tofu validate
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        directory:
+          - _shared/platform-context
+          - vcluster
+          - vcluster-kubeconfig
+          - vcluster-platform-registration
+          - single-namespace-rename
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: opentofu/setup-opentofu@9d84900f3238fab8cd84ce47d658d25dd008be2f # v1.0.8
+        with:
+          tofu_version: "1.9"
+      - name: OpenTofu Init
+        working-directory: ${{ matrix.directory }}
+        run: tofu init -backend=false
+      - name: OpenTofu Test
+        working-directory: ${{ matrix.directory }}
+        run: tofu test -no-color

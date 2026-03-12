@@ -1,6 +1,34 @@
+# Terraform
 .terraform/
-.terraform*
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Secrets - never commit
+terraform.tfvars
+*.auto.tfvars
+
+# Generated credentials
+*-kubeconfig.yaml
+
+# Test artifacts
 result_*
-*.tfstate*
 expected_output.json
 terraform_output.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
